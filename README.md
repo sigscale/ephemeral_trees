@@ -1,5 +1,4 @@
 # Ephemeral Trees
-
 The `ephemeral_trees` project implements a treap data structure using
 timestamps for the heap which allows efficient removal of expired entries.
 
@@ -10,8 +9,7 @@ The implementation is derived from the pseudo-code presented in the paper:
 	February 1, 2008
 	http://arxiv.org/abs/cs/0505038
 
-# Build
-
+## Build
 Port the `ephemeral_trees` application to your environment:
 
 	$ aclocal; autoheader; autoconf; automake --add-missing
@@ -21,17 +19,16 @@ Build the `ephemeral_trees` application and documentation:
 
 	$ make
 
-# Test
-
+## Test
 Test the `ephemeral_trees` application:
 
 	$ make check
 
-# Install
-
+## Install
 Install the `ephemeral_trees` application:
 
 	$ make install
 
+## License
 Everything here is distributed under a BSD 2-clause license.
 
