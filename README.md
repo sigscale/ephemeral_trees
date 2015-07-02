@@ -5,13 +5,10 @@ timestamps for the heap which allows efficient removal of expired entries.
 
 The implementation is derived from the pseudo-code presented in the paper:
 
->	Efficient Management of Short-Lived Data
->	
->	Albrecht Schmidt and Christian S. Jensen
->	
->	February 1, 2008
->	
->	http://arxiv.org/abs/cs/0505038
+	Efficient Management of Short-Lived Data
+	Albrecht Schmidt and Christian S. Jensen
+	February 1, 2008
+	http://arxiv.org/abs/cs/0505038
 
 # Build
 
