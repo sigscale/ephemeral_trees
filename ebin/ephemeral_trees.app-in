@@ -1,0 +1,11 @@
+{application, ephemeral_trees,
+   [{description, "Efficient management of ephemeral data"},
+   {vsn, "%APP_VERSION%"},
+   {modules, [ephemeral_trees]},
+   {maxP, infinity},
+   {maxT, infinity},
+   {registered, []},
+   {included_applications, []},
+   {applications, [kernel, stdlib]},
+   {env, []}]}.
+
