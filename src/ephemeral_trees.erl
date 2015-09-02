@@ -67,8 +67,8 @@ insert(Tree, Key, Item) ->
 		Time :: erlang:timestamp(), Item :: term()) -> treap().
 %% @doc Inserts `Key' with value `Item' into `Tree'.
 %% 	Returns a new `Tree'.
-insert({_, Key, _, _, _} = Tree, Key, _Time, _Item) ->
-	Tree;
+insert({Left, Key, _, _, Right} = Tree, Key, Time, Item) ->
+	{Left, Key, Time, Item, Right};
 insert({Left, K, T, I, Right}, Key, Time, Item) when Key < K ->
 	rebalance({insert(Left, Key, Time, Item), K, T, I, Right});
 insert({Left, K, T, I, Right}, Key, Time, Item) ->
