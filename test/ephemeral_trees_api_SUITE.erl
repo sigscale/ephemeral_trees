@@ -98,7 +98,7 @@ sequences() ->
 %% @doc Returns a list of all test cases in this test suite.
 %%
 all() -> 
-	[new, insert, find, remove, expire].
+	[new, insert, find, remove, expire, overwrite_item, overwrite_time].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -143,6 +143,19 @@ expire(_Config) ->
 	T = example_insert(),
 	{nil,1,7,a,{nil,5,7,e,{nil,7,8,g,nil}}} = ephemeral_trees:expire(T, 6).
 
+overwrite_item() ->
+	[{userdata, [{doc, "Insert new item for existing key."}]}].
+
+overwrite_item(_Config) ->
+	T = example_insert(),
+	{{{nil,1,7,a,nil},2,6,b,{nil,3,6,cbis,nil}},4,0,d,{{nil,5,7,e,nil},6,6,f,{nil,7,8,g,nil}}} = ephemeral_trees:insert(T, 3, 6, cbis).
+
+overwrite_time() ->
+	[{userdata, [{doc, "Insert new time for existing key."}]}].
+
+overwrite_time(_Config) ->
+	T = example_insert(),
+	{{{nil,1,7,a,nil},2,6,b,{nil,3,8,c,nil}},4,0,d,{{nil,5,7,e,nil},6,6,f,{nil,7,8,g,nil}}} = ephemeral_trees:insert(T, 3, 8, c).
 
 %%---------------------------------------------------------------------
 %%  Internal functions
