@@ -32,7 +32,6 @@
 %%%---------------------------------------------------------------------
 %%% @reference <a href="http://arxiv.org/pdf/cs/0505038v1.pdf">
 %%% 	Efficient Management of Short-Lived Data</a>
-%%% @todo Insert on existing key; overwrite or exception?
 %%% @todo Expire during operations?
 %%%---------------------------------------------------------------------
 %%%
