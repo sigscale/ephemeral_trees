@@ -119,35 +119,47 @@ load() ->
 	[{require, runtime}, {userdata, [{doc, "Load a treap over a long time."}]}].
 
 load(Config) ->
+	DataDir = ?config(data_dir, Config),
+	PrivDir = ?config(priv_dir, Config),
 	RunTime = ?config(runtime, Config),
-	Time = os:timestamp(),
-	random:seed(Time),
-	EndTime = add_time(RunTime, Time),
+	StartTime = os:timestamp(),
+	random:seed(StartTime),
+	EndTime = add_time(RunTime, StartTime),
 	Msg = lists:flatten(io_lib:fwrite("This load test will run for ~b seconds.", [RunTime])),
 	erlang:display(Msg),
-	test(EndTime, 0, 0, ephemeral_trees:new()).
+	HtmlFile = "load-test.html",
+	{ok, _} = file:copy(DataDir ++ HtmlFile, PrivDir ++ HtmlFile),
+	{ok, IoDevice} = file:open(PrivDir ++ "load-test.csv", [write, exclusive]),
+	ok = io:fwrite(IoDevice, "Time,Size,Operation,Units~n", []),
+	Url = filename:basename(PrivDir) ++ "/" ++ HtmlFile,
+	test(IoDevice, Url, StartTime, EndTime, 0, ephemeral_trees:new()).
 
 %%---------------------------------------------------------------------
 %%  Internal functions
 %%---------------------------------------------------------------------
 
-test(EndTime, Inserts, CleanTime, Tree) ->
+test(IoDevice, Url, StartTime, EndTime, Inserts, Tree) ->
 	case os:timestamp() of
 		Time when Time >= EndTime ->
-			Size = erlang:external_size(Tree),
-			io:fwrite("Size: ~b, Clean Time: ~bms~n", [Size, CleanTime div 1000]);
+			file:close(IoDevice),
+			{comment, "<a href=\"" ++ Url ++ "\">Graph</a>"};
 		Time when Inserts > 10000 ->
-			{TC, NewTree} = timer:tc(ephemeral_trees, expire, [Tree, subtract_time(60, Time)]),
-			NewTime = os:timestamp(),
-			io:fwrite("~20w: Cleaned in ~bus~n", [NewTime, TC]),
-			sleep(NewTime, Time),
-			test(EndTime, 0, CleanTime + TC, NewTree);
+			{TC, NewTree} = timer:tc(ephemeral_trees, expire,
+					[Tree, subtract_time(60, Time)]),
+			Now = os:timestamp(),
+			Second = timer:now_diff(Now, StartTime) div 1000000,
+			ok = io:fwrite(IoDevice, "~b,~b,clean,~b~n",
+					[Second, erlang:external_size(Tree), TC div 1000]),
+			test(IoDevice, Url, StartTime, EndTime, 0, NewTree);
 		Time ->
 			NewInserts = random:uniform(6000) + 5000,
 			NewTree = loop(Time, NewInserts, Tree),
-			io:fwrite("~20w: Inserted ~b items~n", [Time, NewInserts]),
-			sleep(os:timestamp(), Time),
-			test(EndTime, Inserts + NewInserts, CleanTime, NewTree)
+			Now = os:timestamp(),
+			Second = timer:now_diff(Now, StartTime) div 1000000,
+			ok = io:fwrite(IoDevice, "~b,~b,insert,~b~n",
+					[Second, erlang:external_size(Tree), NewInserts]),
+			sleep(Now, Time),
+			test(IoDevice, Url, StartTime, EndTime, Inserts + NewInserts, NewTree)
 	end.
 
 loop(_, 0, Tree) ->
