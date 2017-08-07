@@ -40,7 +40,7 @@
 -export([new/0, find/2, insert/3, insert/4, remove/2, expire/2]).
 
 -opaque treap() :: nil | {Left :: treap(), Key :: term(),
-		Time :: erlang:timestamp(), Item :: term(), Right :: treap()}.
+		Time :: erlang:system_time(), Item :: term(), Right :: treap()}.
 -export_type([treap/0]).
 
 -spec new() -> treap().
@@ -60,13 +60,13 @@ find({_, _, _, _, Right}, Key) ->
 -spec insert(Tree :: treap(), Key :: term(), Item :: term()) -> treap().
 %% @equiv insert(Tree, Key, os:timestamp(), Item)
 insert(Tree, Key, Item) ->
-	insert(Tree, Key, os:timestamp(), Item).
+	insert(Tree, Key, erlang:system_time(), Item).
 
 -spec insert(Tree :: treap(), Key :: term(),
-		Time :: erlang:timestamp(), Item :: term()) -> treap().
+		Time :: erlang:system_time(), Item :: term()) -> treap().
 %% @doc Inserts `Key' with value `Item' into `Tree'.
 %% 	Returns a new `Tree'.
-insert({Left, Key, _, _, Right} = Tree, Key, Time, Item) ->
+insert({Left, Key, _, _, Right} = _Tree, Key, Time, Item) ->
 	{Left, Key, Time, Item, Right};
 insert({Left, K, T, I, Right}, Key, Time, Item) when Key < K ->
 	rebalance({insert(Left, Key, Time, Item), K, T, I, Right});
@@ -84,7 +84,7 @@ remove({Left, K, T, I, Right}, Key) when Key < K ->
 remove({Left, K, T, I, Right}, Key) ->
 	{Left, K, T, I, remove(Right, Key)}.
 	
--spec expire(Node :: treap(), Time :: erlang:timestamp()) -> treap().
+-spec expire(Node :: treap(), Time :: erlang:system_time()) -> treap().
 %% @doc Remove everything older than `Time'.
 expire({_, K, T, _, _} = Node, Time) when T =< Time ->
 	expire(remove(Node, K), Time);
