@@ -5,7 +5,7 @@
 modhtml = ephemeral_trees.html
 
 doc_DATA = overview.edoc $(modhtml) \
-		modules-frame.html overview-summary.html packages-frame.html \
+		modules-frame.html overview-summary.html \
 		index.html stylesheet.css
 
 overview.edoc: overview.edoc-in
@@ -22,7 +22,7 @@ overview.edoc: overview.edoc-in
 					mv t.html $$i; done
 
 CLEANFILES = overview.edoc edoc-info index.html \
-		modules-frame.html overview-summary.html packages-frame.html \
+		modules-frame.html overview-summary.html \
 		stylesheet.css erlang.png $(modhtml)
 
 INSTALL += -o otpuser -g otp
