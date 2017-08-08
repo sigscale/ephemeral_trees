@@ -13,7 +13,7 @@
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.js"></script>
 		<script type="text/javascript" src="http://dc-js.github.io/dc.js/js/dc.js"></script>
 		<script type="text/javascript">
-			d3.csv("load-test.csv", function (error, data) {
+			d3.csv("%load-test%.csv", function (error, data) {
 				var ndx = crossfilter(data);
 				var timeDimension = ndx.dimension(function(d) {return d.Time;});
 				var totalForOperation = function(op) {

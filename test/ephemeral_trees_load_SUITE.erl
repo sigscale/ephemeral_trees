@@ -5,18 +5,18 @@
 %%%
 %%% Copyright (c) 2014-2015, Vance Shipley
 %%% All rights reserved.
-%%% 
-%%% Redistribution and use in source and binary forms, with or without 
+%%%
+%%% Redistribution and use in source and binary forms, with or without
 %%% modification, are permitted provided that the following conditions
 %%% are met:
-%%% 
+%%%
 %%% 1. Redistributions of source code must retain the above copyright
 %%% notice, this list of conditions and the following disclaimer.
-%%% 
+%%%
 %%% 2. Redistributions in binary form must reproduce the above copyright
 %%% notice, this list of conditions and the following disclaimer in the
 %%% documentation and/or other materials provided with the distribution.
-%%% 
+%%%
 %%% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 %%% "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 %%% LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -94,13 +94,13 @@ init_per_testcase(_TestCase, Config) ->
 end_per_testcase(_TestCase, _Config) ->
 	ok.
 
-%% @spec () -> Sequences 
+%% @spec () -> Sequences
 %% 	Sequences = [{SeqName, Testcases}]
 %% 	SeqName = atom()
 %% 	Testcases = [atom()]
 %% @doc Group test cases into a test sequence.
 %%
-sequences() -> 
+sequences() ->
 	[].
 
 %% @spec () -> TestCases
@@ -108,17 +108,39 @@ sequences() ->
 %% 	Case = atom()
 %% @doc Returns a list of all test cases in this test suite.
 %%
-all() -> 
-	[load].
+all() ->
+	[load10k, load50k, load100k].
 
 %%---------------------------------------------------------------------
 %%  Test cases
 %%---------------------------------------------------------------------
 
-load() ->
-	[{require, runtime}, {userdata, [{doc, "Load a treap over a long time."}]}].
+load10k() ->
+	[{require, runtime},
+			{userdata, [{doc, "Load a treap at ~10K/s for an hour."}]}].
 
-load(Config) ->
+load10k(Config) ->
+	load_test(Config, 10000).
+
+load50k() ->
+	[{require, runtime},
+			{userdata, [{doc, "Load a treap at ~50K/s for an hour."}]}].
+
+load50k(Config) ->
+	load_test(Config, 50000).
+
+load100k() ->
+	[{require, runtime},
+			{userdata, [{doc, "Load a treap at ~100K/s for an hour."}]}].
+
+load100k(Config) ->
+	load_test(Config, 100000).
+
+%%---------------------------------------------------------------------
+%%  Internal functions
+%%---------------------------------------------------------------------
+
+load_test(Config, Rate) ->
 	DataDir = ?config(data_dir, Config),
 	PrivDir = ?config(priv_dir, Config),
 	RunTime = ?config(runtime, Config),
@@ -126,48 +148,52 @@ load(Config) ->
 	TimeUnit =  erlang:convert_time_unit(1, second, native),
 	random:seed(os:timestamp()),
 	EndTime = StartTime + RunTime * TimeUnit,
-	Msg = lists:flatten(io_lib:fwrite("This load test will run for ~b seconds.", [RunTime])),
-	erlang:display(Msg),
-	HtmlFile = "load-test.html",
-	{ok, _} = file:copy(DataDir ++ HtmlFile, PrivDir ++ HtmlFile),
-	{ok, IoDevice} = file:open(PrivDir ++ "load-test.csv", [write, exclusive]),
+	Msg = io_lib:fwrite("This load test will run for ~b seconds.", [RunTime]),
+	erlang:display(lists:flatten(Msg)),
+	{ok, HtmlBinIn} = file:read_file(DataDir ++ "/load-test.html"),
+	HtmlFile = "load-test-" ++ integer_to_list(Rate) ++ ".html",
+	HtmlBinOut = re:replace(HtmlBinIn, "%load-test%",
+			"load-test-" ++ integer_to_list(Rate)),
+	ok = file:write_file(PrivDir ++ HtmlFile, HtmlBinOut),
+	{ok, IoDevice} = file:open(PrivDir ++ "load-test-"
+			++ integer_to_list(Rate) ++ ".csv", [write, exclusive]),
 	ok = io:fwrite(IoDevice, "Time,Size,Operation,Units~n", []),
 	Url = filename:basename(PrivDir) ++ "/" ++ HtmlFile,
-	test(IoDevice, Url, TimeUnit, StartTime, EndTime, 0, ephemeral_trees:new()).
+	load_test(IoDevice, Url, Rate, TimeUnit,
+			StartTime, EndTime, 0, ephemeral_trees:new()).
 
-%%---------------------------------------------------------------------
-%%  Internal functions
-%%---------------------------------------------------------------------
-
-test(IoDevice, Url, TimeUnit, StartTime, EndTime, Inserts, Tree) ->
+load_test(IoDevice, Url, Rate, TimeUnit, StartTime, EndTime, Inserts, Tree) ->
 	case erlang:system_time() of
 		Time when Time >= EndTime ->
 			file:close(IoDevice),
 			{comment, "<a href=\"" ++ Url ++ "\">Graph</a>"};
-		Time when Inserts > 10000 ->
+		Time when Inserts > Rate ->
 			ExpireTime = Time - 60 * TimeUnit,
 			{TC, NewTree} = timer:tc(ephemeral_trees, expire, [Tree, ExpireTime]),
 			Now = erlang:system_time(),
 			Second = (Now - StartTime) div TimeUnit,
 			ok = io:fwrite(IoDevice, "~b,~b,clean,~b~n",
 					[Second, erlang:external_size(Tree), TC div 1000]),
-			test(IoDevice, Url, TimeUnit, StartTime, EndTime, 0, NewTree);
+			load_test(IoDevice, Url, Rate, TimeUnit,
+					StartTime, EndTime, 0, NewTree);
 		Time ->
-			NewInserts = random:uniform(6000) + 5000,
-			NewTree = loop(Time, NewInserts, Tree),
+			NewInserts = random:uniform(Rate + Rate div 3),
+			NewTree = load_loop(Time, NewInserts, Tree),
 			Now = erlang:system_time(),
 			Second = (Now - StartTime) div TimeUnit,
 			ok = io:fwrite(IoDevice, "~b,~b,insert,~b~n",
 					[Second, erlang:external_size(Tree), NewInserts]),
 			sleep(TimeUnit, Now - Time),
-			test(IoDevice, Url, TimeUnit, StartTime, EndTime, Inserts + NewInserts, NewTree)
+			load_test(IoDevice, Url, Rate, TimeUnit, StartTime, EndTime,
+					Inserts + NewInserts, NewTree)
 	end.
 
-loop(_, 0, Tree) ->
+load_loop(_, 0, Tree) ->
 	Tree;
-loop(Time, N, Tree) ->
-	NewTree = ephemeral_trees:insert(Tree, random:uniform(999999999), Time, Time),
-	loop(Time, N - 1, NewTree).
+load_loop(Time, N, Tree) ->
+	NewTree = ephemeral_trees:insert(Tree,
+			random:uniform(999999999), Time, Time),
+	load_loop(Time, N - 1, NewTree).
 
 sleep(TimeUnit, Offset) when (Offset div TimeUnit) > 0 ->
 	ok;
