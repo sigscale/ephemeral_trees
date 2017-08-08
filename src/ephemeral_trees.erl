@@ -58,7 +58,7 @@ find({_, _, _, _, Right}, Key) ->
 	find(Right, Key).
 
 -spec insert(Tree :: treap(), Key :: term(), Item :: term()) -> treap().
-%% @equiv insert(Tree, Key, os:timestamp(), Item)
+%% @equiv insert(Tree, Key, erlang:system_time(), Item)
 insert(Tree, Key, Item) ->
 	insert(Tree, Key, erlang:system_time(), Item).
 
