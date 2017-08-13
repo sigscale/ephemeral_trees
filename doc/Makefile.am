@@ -16,9 +16,9 @@ overview.edoc: overview.edoc-in
 	$(ERL) -noshell -run edoc_run application \
 			"'$(PACKAGE_NAME)'" "'$(top_srcdir)'" \
 			'[{sort_functions,false},{private,true},{todo,true}]'
-	for i in `ls *.html`; do sed -e 's!erlang logo!Motivity logo!' \
-			-e 's!erlang.org!motivity.ca!' \
-			-e 's!erlang.png!motivitylogo.png!' < $$i > t.html; \
+	for i in `ls *.html`; do sed -e 's!erlang logo!SigScale logo!' \
+			-e 's!erlang.org!sigscale.org!' \
+			-e 's!erlang.png!sigscale-logo.png!' < $$i > t.html; \
 					mv t.html $$i; done
 
 CLEANFILES = overview.edoc edoc-info index.html \

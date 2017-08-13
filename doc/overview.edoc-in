@@ -1,5 +1,5 @@
-@copyright 2014-2015 Motivity Telecom
-@author Vance Shipley <vances@cmotivity.ca>
+@copyright 2014-2017 SigScale Global Inc.
+@author Vance Shipley <vances@sigscale.org>
 @version %APP_VERSION%
 @title %APP_NAME%
 @reference <a href="http://arxiv.org/abs/cs/0505038">
@@ -7,6 +7,7 @@
 @doc This library application implements ephemeral binary trees.
 	The underlying data structure is a
 	<a href="http://en.wikipedia.org/wiki/Treap">treap</a> where the heap
-	attribute is an {@link //erts/erlang:timestamp(). erlang:timestamp()}.
+	attribute is derived from
+	{@link //erts/erlang:system_time(). erlang:system_time()}.
 	Expired entries are effeciently removed.
 

@@ -4,8 +4,8 @@
 ##
 ## Boilerplate:  standard boilerplate code
 ##
-AC_INIT([ephemeral_trees], [1.0], [vances@motivity.ca])
-AC_COPYRIGHT([Copyright (c) 2014-2015 Motivity Telecom])
+AC_INIT([ephemeral_trees], [1.1], [vances@sigscale.org])
+AC_COPYRIGHT([Copyright (c) 2014-2017 SigScale Global Inc.])
 AC_PREREQ(2.63)
 AC_LANG([Erlang])
 AC_CONFIG_SRCDIR([src/ephemeral_trees.erl])

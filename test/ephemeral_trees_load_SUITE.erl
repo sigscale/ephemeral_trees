@@ -1,9 +1,9 @@
 %%%---------------------------------------------------------------------
-%%% @copyright 2014-2015 Motivity Telecom
-%%% @author Vance Shipley <vances@motivity.ca> [http://www.motivity.ca]
+%%% @copyright 2014-2017 SigScale Global Inc.
+%%% @author Vance Shipley <vances@sigscale.org> [http://www.sigscale.org]
 %%% @end
 %%%
-%%% Copyright (c) 2014-2015, Vance Shipley
+%%% Copyright (c) 2014-2017, SigScale Global Inc.
 %%% All rights reserved.
 %%%
 %%% Redistribution and use in source and binary forms, with or without
