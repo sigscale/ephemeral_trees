@@ -108,7 +108,7 @@ new() ->
 	[{userdata, [{doc, "Create new treap."}]}].
 
 new(_Config) ->
-	nil = ephemeral_trees:new().
+	undefined = ephemeral_trees:new().
 
 insert() ->
 	[{userdata, [{doc, "Insert example values used in paper."}]}].
@@ -134,28 +134,28 @@ remove() ->
 
 remove(_Config) ->
 	T = example_insert(),
-   {{{nil,1,7,a,nil},3,6,c,nil},2,6,b,{{nil,5,7,e,nil},6,6,f,{nil,7,8,g,nil}}} = ephemeral_trees:remove(T, 4).
+   {{{undefined,1,7,a,undefined},3,6,c,undefined},2,6,b,{{undefined,5,7,e,undefined},6,6,f,{undefined,7,8,g,undefined}}} = ephemeral_trees:remove(T, 4).
 
 expire() ->
 	[{userdata, [{doc, "Expire example values used in paper."}]}].
 
 expire(_Config) ->
 	T = example_insert(),
-	{nil,1,7,a,{nil,5,7,e,{nil,7,8,g,nil}}} = ephemeral_trees:expire(T, 6).
+	{{{undefined,1,7,a,undefined},3,6,c,undefined},2,6,b,{{undefined,5,7,e,undefined},6,6,f,{undefined,7,8,g,undefined}}} = ephemeral_trees:expire(T, 6).
 
 overwrite_item() ->
 	[{userdata, [{doc, "Insert new item for existing key."}]}].
 
 overwrite_item(_Config) ->
 	T = example_insert(),
-	{{{nil,1,7,a,nil},2,6,b,{nil,3,6,cbis,nil}},4,0,d,{{nil,5,7,e,nil},6,6,f,{nil,7,8,g,nil}}} = ephemeral_trees:insert(T, 3, 6, cbis).
+	{{{undefined,1,7,a,undefined},2,6,b,{undefined,3,6,cbis,undefined}},4,0,d,{{undefined,5,7,e,undefined},6,6,f,{undefined,7,8,g,undefined}}} = ephemeral_trees:insert(T, 3, 6, cbis).
 
 overwrite_time() ->
 	[{userdata, [{doc, "Insert new time for existing key."}]}].
 
 overwrite_time(_Config) ->
 	T = example_insert(),
-	{{{nil,1,7,a,nil},2,6,b,{nil,3,8,c,nil}},4,0,d,{{nil,5,7,e,nil},6,6,f,{nil,7,8,g,nil}}} = ephemeral_trees:insert(T, 3, 8, c).
+	{{{undefined,1,7,a,undefined},2,6,b,{undefined,3,8,c,undefined}},4,0,d,{{undefined,5,7,e,undefined},6,6,f,{undefined,7,8,g,undefined}}} = ephemeral_trees:insert(T, 3, 8, c).
 
 %%---------------------------------------------------------------------
 %%  Internal functions
@@ -163,15 +163,15 @@ overwrite_time(_Config) ->
 
 example_insert() ->
 	T1 = ephemeral_trees:insert(ephemeral_trees:new(), 1, 7, a),
-	{nil,1,7,a,nil} = T1,
+	{undefined,1,7,a,undefined} = T1,
 	T2 = ephemeral_trees:insert(T1, 2, 6, b),
-	{{nil,1,7,a,nil},2,6,b,nil} = T2,
+	{{undefined,1,7,a,undefined},2,6,b,undefined} = T2,
 	T3 = ephemeral_trees:insert(T2, 3, 6, c),
-	{{nil,1,7,a,nil},2,6,b,{nil,3,6,c,nil}} = T3,
+	{{undefined,1,7,a,undefined},2,6,b,{undefined,3,6,c,undefined}} = T3,
 	T4 = ephemeral_trees:insert(T3, 4, 0, d),
-	{{{nil,1,7,a,nil},2,6,b,{nil,3,6,c,nil}},4,0,d,nil} = T4,
+	{{{undefined,1,7,a,undefined},2,6,b,{undefined,3,6,c,undefined}},4,0,d,undefined} = T4,
 	T5 = ephemeral_trees:insert(T4, 5, 7, e),
 	T6 = ephemeral_trees:insert(T5, 6, 6, f),
 	T7 = ephemeral_trees:insert(T6, 7, 8, g),
-	{{{nil,1,7,a,nil},2,6,b,{nil,3,6,c,nil}},4,0,d,{{nil,5,7,e,nil},6,6,f,{nil,7,8,g,nil}}} = T7.
+	{{{undefined,1,7,a,undefined},2,6,b,{undefined,3,6,c,undefined}},4,0,d,{{undefined,5,7,e,undefined},6,6,f,{undefined,7,8,g,undefined}}} = T7.
 
