@@ -98,7 +98,7 @@ sequences() ->
 %% @doc Returns a list of all test cases in this test suite.
 %%
 all() -> 
-	[new, insert, find, remove, expire, overwrite_item, overwrite_time].
+	[new, insert, get, delete, expire, overwrite_item, overwrite_time].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -116,25 +116,25 @@ insert() ->
 insert(_Config) ->
 	example_insert().
 
-find() ->
+get() ->
 	[{userdata, [{doc, "Find example values used in paper."}]}].
 
-find(_Config) ->
+get(_Config) ->
 	T = example_insert(),
-	a = ephemeral_trees:find(T, 1),
-	b = ephemeral_trees:find(T, 2),
-	c = ephemeral_trees:find(T, 3),
-	d = ephemeral_trees:find(T, 4),
-	e = ephemeral_trees:find(T, 5),
-	f = ephemeral_trees:find(T, 6),
-	g = ephemeral_trees:find(T, 7).
+	a = ephemeral_trees:get(T, 1),
+	b = ephemeral_trees:get(T, 2),
+	c = ephemeral_trees:get(T, 3),
+	d = ephemeral_trees:get(T, 4),
+	e = ephemeral_trees:get(T, 5),
+	f = ephemeral_trees:get(T, 6),
+	g = ephemeral_trees:get(T, 7).
 
-remove() ->
+delete() ->
 	[{userdata, [{doc, "Remove example values used in paper."}]}].
 
-remove(_Config) ->
+delete(_Config) ->
 	T = example_insert(),
-   {{{undefined,1,7,a,undefined},3,6,c,undefined},2,6,b,{{undefined,5,7,e,undefined},6,6,f,{undefined,7,8,g,undefined}}} = ephemeral_trees:remove(T, 4).
+   {{{undefined,1,7,a,undefined},3,6,c,undefined},2,6,b,{{undefined,5,7,e,undefined},6,6,f,{undefined,7,8,g,undefined}}} = ephemeral_trees:delete(T, 4).
 
 expire() ->
 	[{userdata, [{doc, "Expire example values used in paper."}]}].

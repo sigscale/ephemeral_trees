@@ -38,7 +38,7 @@
 %%%
 -module(ephemeral_trees).
 
--export([new/0, find/2, insert/3, insert/4, remove/2, expire/2]).
+-export([new/0, get/2, insert/3, insert/4, delete/2, expire/2]).
 
 -opaque treap() :: undefined | {Left :: treap(), Key :: term(),
 		Time :: pos_integer(), Item :: term(), Right :: treap()}.
@@ -46,7 +46,7 @@
 %% @type treap(). The treap data structure is a combination of a tree
 %% 	and a heap. This `treap()' is a binary search tree with respect
 %% 	to a `Key' and a heap with respect to an integer `Time'. The
-%% 	tree is rebalanced when an `Item' is inserted or removed so that
+%% 	tree is rebalanced when an `Item' is inserted or deleted so that
 %%		the oldest entries are leef nodes and the newest are clustered
 %% 	around the root of the tree. The main benefit is that expiring
 %% 	all entries older than a selected `Time' may be done very
@@ -59,19 +59,19 @@
 new() ->
 	undefined.
 
--spec find(Tree, Key) -> Item
+-spec get(Tree, Key) -> Item
 	when
 		Tree :: treap(),
 		Key :: term(),
 		Item :: term().
 %% @doc Retrieves the value stored with `Key' in `Tree'.
 %% 	Assumes the key exists, crashes otherwise.
-find({_, Key, _, Item, _} = _Tree, Key) ->
+get({_, Key, _, Item, _} = _Tree, Key) ->
 	Item;
-find({Left, K, _, _, _}, Key) when Key < K ->
-	find(Left, Key);
-find({_, _, _, _, Right}, Key) ->
-	find(Right, Key).
+get({Left, K, _, _, _}, Key) when Key < K ->
+	get(Left, Key);
+get({_, _, _, _, Right}, Key) ->
+	get(Right, Key).
 
 -spec insert(Tree1, Key, Item) -> Tree2
 	when
@@ -101,19 +101,20 @@ insert({Left, K, T, I, Right}, Key, Time, Item) ->
 insert(undefined, Key, Time, Item) ->
 	{undefined, Key, Time, Item, undefined}.
 
--spec remove(Tree1, Key) -> Tree2
+-spec delete(Tree1, Key) -> Tree2
 	when
 		Tree1 :: treap(),
 		Key :: term(),
 		Tree2 :: treap().
 %% @doc Remove `Key' from `Tree1'.
+%% 	Assumes the key exists, crashes otherwise.
 %% 	Returns a new `treap()' in `Tree2'.
-remove({_, Key, _, _, _} = Tree1, Key) ->
+delete({_, Key, _, _, _} = Tree1, Key) ->
 	percolate(Tree1);
-remove({Left, K, T, I, Right}, Key) when Key < K ->
-	{remove(Left, Key), K, T, I, Right};
-remove({Left, K, T, I, Right}, Key) ->
-	{Left, K, T, I, remove(Right, Key)}.
+delete({Left, K, T, I, Right}, Key) when Key < K ->
+	{delete(Left, Key), K, T, I, Right};
+delete({Left, K, T, I, Right}, Key) ->
+	{Left, K, T, I, delete(Right, Key)}.
 	
 -spec expire(Tree1, Time) -> Tree2
 	when
@@ -123,7 +124,7 @@ remove({Left, K, T, I, Right}, Key) ->
 %% @doc Efficiently emove every item older than `Time'.
 %% 	Returns a new `treap()' in `Tree2'.
 expire({_, K, T, _, _} = Tree1, Time) when T < Time ->
-	expire(remove(Tree1, K), Time);
+	expire(delete(Tree1, K), Time);
 expire(Tree, _Time) ->
 	Tree.
 
