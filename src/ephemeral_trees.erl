@@ -86,7 +86,7 @@ remove({Left, K, T, I, Right}, Key) ->
 	
 -spec expire(Node :: treap(), Time :: erlang:system_time()) -> treap().
 %% @doc Remove everything older than `Time'.
-expire({_, K, T, _, _} = Node, Time) when T =< Time ->
+expire({_, K, T, _, _} = Node, Time) when T < Time ->
 	expire(remove(Node, K), Time);
 expire(Node, _Time) ->
 	Node.
