@@ -15,6 +15,3 @@ check_DATA = .dialyzer_ok .common_test_ok
 clean-local:
 	-rm -r test/*.beam test/log/*
 
-install-exec-hook:
-	chown -R otpuser:otp $(appdir)
-
