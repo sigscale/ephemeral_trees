@@ -39,14 +39,14 @@
 
 -export([new/0, find/2, insert/3, insert/4, remove/2, expire/2]).
 
--opaque treap() :: nil | {Left :: treap(), Key :: term(),
+-opaque treap() :: undefined | {Left :: treap(), Key :: term(),
 		Time :: erlang:system_time(), Item :: term(), Right :: treap()}.
 -export_type([treap/0]).
 
 -spec new() -> treap().
 %% @doc Returns a new empty `Tree'.
 new() ->
-	nil.
+	undefined.
 
 -spec find(Tree :: treap(), Key :: term()) -> Item :: term().
 %% @doc Find value `Item' with key `Key' in `Tree'.
@@ -72,8 +72,8 @@ insert({Left, K, T, I, Right}, Key, Time, Item) when Key < K ->
 	rebalance({insert(Left, Key, Time, Item), K, T, I, Right});
 insert({Left, K, T, I, Right}, Key, Time, Item) ->
 	rebalance({Left, K, T, I, insert(Right, Key, Time, Item)});
-insert(nil, Key, Time, Item) ->
-	{nil, Key, Time, Item, nil}.
+insert(undefined, Key, Time, Item) ->
+	{undefined, Key, Time, Item, undefined}.
 
 -spec remove(Node :: treap(), Key :: term()) -> treap().
 %% @doc Remove `Key' from `Tree'.
@@ -108,12 +108,12 @@ rebalance(Node) ->
 -spec percolate(Node :: treap()) -> treap().
 %% @doc Rebalancing node rotations during removal.
 %% @private
-percolate({nil, _, _, _, nil}) ->
-	nil;
-percolate({nil, K, T, I, {Lr, Kr, Tr, Ir, Rr}}) ->
-	{Lr, Kr, Tr, Ir, percolate({nil, K, T, I, Rr})};
-percolate({{Ll, Kl, Tl, Il, Rl}, K, T, I, nil}) ->
-	{percolate({Ll, K, T, I, nil}), Kl, Tl, Il, Rl};
+percolate({undefined, _, _, _, undefined}) ->
+	undefined;
+percolate({undefined, K, T, I, {Lr, Kr, Tr, Ir, Rr}}) ->
+	{Lr, Kr, Tr, Ir, percolate({undefined, K, T, I, Rr})};
+percolate({{Ll, Kl, Tl, Il, Rl}, K, T, I, undefined}) ->
+	{percolate({Ll, K, T, I, undefined}), Kl, Tl, Il, Rl};
 percolate({{Ll, Kl, Tl, Il, Rl}, K, T, I,
 		{_, _, Tr, _, _} = Right}) when Tl =< Tr ->
 	{percolate({Ll, K, T, I, Rl}), Kl, Tl, Il, Right};
